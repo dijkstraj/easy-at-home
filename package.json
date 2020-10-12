@@ -1,0 +1,22 @@
+{
+  "name": "easy-at-home",
+  "version": "1.0.0",
+  "description": "Helpers for machine setup",
+  "main": "index.js",
+  "scripts": {
+    "test": "cypress run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dijkstraj/easy-at-home.git"
+  },
+  "author": "Jogchem Dijkstra <jogchem@gmail.com>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/dijkstraj/easy-at-home/issues"
+  },
+  "homepage": "https://github.com/dijkstraj/easy-at-home#readme",
+  "devDependencies": {
+    "cypress": "^5.3.0"
+  }
+}

@@ -23,6 +23,12 @@ function ask_one_time_question() {
   fi
 }
 
+function prepare_lpass() {
+  if ! lpass status; then
+    lpass login $EMAIL
+  fi
+}
+
 # start with the latest
 sudo apt update
 sudo apt upgrade -y
@@ -110,7 +116,7 @@ if [ ! -f /usr/bin/lpass ]; then
   (cd /tmp/lastpass-cli; sudo make install)
 fi
 
-# editor - cli
+# editor - cli: spacemacs
 if [ $(dpkg-query -W -f='${Status}' emacs 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   sudo apt install -y emacs
 fi
@@ -118,7 +124,7 @@ if [ ! -d ~/.emacs.d ]; then
   git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
 fi
 
-# editor - gui
+# editor - gui: sublime text
 if [ $(dpkg-query -W -f='${Status}' sublime-text 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
   sudo apt-get install -y apt-transport-https
@@ -128,21 +134,37 @@ if [ $(dpkg-query -W -f='${Status}' sublime-text 2>/dev/null | grep -c "ok insta
 fi
 
 # PIA
-if
-    [ ! -d /opt/piavpn/bin/ ]; then
+if [ ! -d /opt/piavpn/bin/ ]; then
   curl -fsSL https://installers.privateinternetaccess.com/download/pia-linux-2.5-05652.run -o /tmp/pia.run 
   chmod +x /tmp/pia.run
   /tmp/pia.run
 fi
 
-# synergy
-if ! lpass status; then
-  lpass login $EMAIL
-fi
-
 # languages
+#  python
 sudo apt install -y python3 idle3
+#  java
 # todo: sdkman
+#  node
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | zsh
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm install --lts
+
+# helpers
+npm ci
+
+# synergy
+if [ $(dpkg-query -W -f='${Status}' synergy 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  prepare_lpass
+  npx cypress run --headless --quiet --spec cypress/integration/synergy_serial.js --env "EMAIL=$(lpass show --username 'synergy'),PASSWORD=$(lpass show --password 'synergy')"
+  curl --silent --output /tmp/synergy.deb $(</tmp/synergy.deb.url)
+  sudo apt install -y /tmp/synergy.deb
+  echo "We've just installed Synergy and now we're going to open it for you to paste the serial key (which we've put on your clipboard)"
+  cat /tmp/synergy.serial | xclip -sel clip
+  /usr/bin/synergy
+fi
 
 # browsers
 if [ ! -f /usr/bin/google-chrome ]; then
@@ -154,5 +176,8 @@ fi
 rm -f /tmp/pia.run
 rm -rf /tmp/lastpass-cli
 rm -f /tmp/chrome.deb
+rm -f /tmp/synergy.serial
+rm -f /tmp/synergy.deb
+rm -f /tmp/synergy.deb.url
 sudo apt autoremove
 sudo apt autoclean
