@@ -131,6 +131,8 @@ if [ $(dpkg-query -W -f='${Status}' sublime-text 2>/dev/null | grep -c "ok insta
   echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
   sudo apt update
   sudo apt install -y sublime-text
+  prepare_lpass
+  lpass show --notes "Sublime Text user license" > ~/.config/sublime-text-3/Local/License.sublime_license
 fi
 
 # PIA
