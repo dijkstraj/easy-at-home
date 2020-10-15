@@ -164,6 +164,7 @@ if [ $(dpkg-query -W -f='${Status}' synergy 2>/dev/null | grep -c "ok installed"
   curl --silent --output /tmp/synergy.deb $(</tmp/synergy.deb.url)
   sudo apt install -y /tmp/synergy.deb
   echo "We've just installed Synergy and now we're going to open it for you to paste the serial key (which we've put on your clipboard)"
+  read
   cat /tmp/synergy.serial | xclip -sel clip
   /usr/bin/synergy
 fi
@@ -172,6 +173,33 @@ fi
 if [ ! -f /usr/bin/google-chrome ]; then
   curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/chrome.deb
   sudo apt install /tmp/chrome.deb
+fi
+
+# spotify
+if [ $(dpkg-query -W -f='${Status}' spotify-client 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  # official gui
+  curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | sudo apt-key add -
+  echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
+  sudo apt update && sudo apt install -y spotify-client
+  prepare_lpass
+  echo "We've just installed Spotify and now we're going to open it for you to login (username is \"$(lpass show --username spotify)\" and the password is on your clipboard)"
+  read
+  lpass show --password spotify | xclip -sel clip
+  spotify
+
+  # tizonia cli
+  curl -kL https://github.com/tizonia/tizonia-openmax-il/raw/master/tools/install.sh | bash
+  sed -i "s/# spotify.user     = user/spotify.user = $(lpass show --username spotify)/" ~/.config/tizonia/tizonia.conf
+  sed -i "s/# spotify.password = pass/spotify.password = $(lpass show --password spotify)/" ~/.config/tizonia/tizonia.conf
+  sed -i "s/# spotify.recover_lost_token = .*/spotify.recover_lost_token = true/" ~/.config/tizonia/tizonia.conf
+  sed -i "s/# spotify.allow_explicit_tracks = .*/spotify.allow_explicit_tracks = true/" ~/.config/tizonia/tizonia.conf
+fi
+
+# signal
+if [ $(dpkg-query -W -f='${Status}' signal-desktop 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  curl --silent https://updates.signal.org/desktop/apt/keys.asc | sudo apt-key add -
+  echo "deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main" | sudo tee -a /etc/apt/sources.list.d/signal-xenial.list
+  sudo apt update && sudo apt install -y signal-desktop
 fi
 
 # cleanup
