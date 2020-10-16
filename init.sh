@@ -202,6 +202,21 @@ if [ $(dpkg-query -W -f='${Status}' signal-desktop 2>/dev/null | grep -c "ok ins
   sudo apt update && sudo apt install -y signal-desktop
 fi
 
+# supercollider
+if [ ! -f /usr/local/bin/sclang ]; then
+  mkdir -p ~/Projects
+  curl --silent --location https://github.com/supercollider/supercollider/releases/download/Version-3.11.1/SuperCollider-3.11.1-Source.tar.bz2 | tar xf - -C ~/Projects/
+  sudo add-apt-repository -y ppa:beineri/opt-qt-5.15.0-focal
+  sudo apt update
+  sudo apt install -y qt515base qt515location qt515declarative qt515tools qt515webchannel qt515xmlpatterns qt515svg qt515webengine qt515websockets
+  sudo apt install -y git libasound2-dev libicu-dev libreadline6-dev libudev-dev pkg-config libncurses5-dev
+  sudo apt install -y cmake libsndfile1-dev libjack-dev fftw-dev libxt-dev libavahi-client-dev libgl-dev
+  mkdir ~/Projects/SuperCollider-3.11.1-Source/build
+  (cd ~/Projects/SuperCollider-3.11.1-Source/build && cmake ..)
+  (cd ~/Projects/SuperCollider-3.11.1-Source/build && make)
+  (cd ~/Projects/SuperCollider-3.11.1-Source/build && sudo make install)
+fi
+
 # cleanup
 rm -f /tmp/pia.run
 rm -rf /tmp/lastpass-cli
