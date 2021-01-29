@@ -1,0 +1,28 @@
+---
+- name: emacs
+  apt:
+    name: emacs
+  become: yes
+
+- name: spacemacs
+  git:
+    repo: https://github.com/syl20bnr/spacemacs
+    dest: /home/{{ user }}/.emacs.d
+
+- name: sublime text - repo
+  apt_repository:
+    repo: deb https://download.sublimetext.com/ apt/stable/
+    state: present
+    filename: sublime-text
+  become: yes
+
+- name: sublime text
+  apt:
+    name: sublime-text
+    update_cache: yes
+  become: yes
+
+- name: sublime text - license
+  shell:
+    cmd: lpass show --notes "Sublime Test user license" > /home/{{ user }}/.config/sublime-text-3/Local/License.sublime_license
+    creates: /home/{{ user }}/.config/sublime-text-3/Local/License.sublime_license

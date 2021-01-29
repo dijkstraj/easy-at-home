@@ -1,0 +1,6 @@
+---
+- name: configure
+  hosts: localhost
+  roles:
+    - base
+    - dev

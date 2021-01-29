@@ -1,0 +1,39 @@
+---
+- name: core packages
+  apt:
+    pkg:
+      - curl
+      - wget
+      - apt-transport-https
+      - ca-certificates
+      - gnupg-agent
+      - software-properties-common
+      - xclip
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: copy-paste attack protection
+  copy:
+    dest: /home/{{ user }}/.inputrc
+    content: |
+      set enable-bracketed-paste on
+
+- name: check if lastpass-cli exists
+  stat:
+    path: /bin/lpass
+  register: lpass_result
+
+- include: lastpass.yml
+  when: not lpass_result.stat.exists
+
+- name: check lastpass login
+  shell: lpass status
+  register: lpass_status
+  failed_when: lpass_status.rc > 1
+
+- name: login to lastpass
+  shell: lpass login {{ email }}
+  when: lpass_status.rc > 0
+
+- include: zsh.yml

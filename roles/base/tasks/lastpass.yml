@@ -1,0 +1,37 @@
+---
+- name: lastpass-cli - build tools
+  apt:
+    pkg:
+      - bash-completion
+      - build-essential
+      - cmake
+      - libcurl4
+      - libcurl4-openssl-dev
+      - libssl-dev
+      - libxml2
+      - libxml2-dev
+      - libssl1.1
+      - pkg-config
+      - ca-certificates
+  become: yes
+
+- name: lastpass-cli - pull source code
+  git:
+    repo: https://github.com/lastpass/lastpass-cli.git
+    dest: /tmp/lastpass-cli
+
+- name: lastpass-cli - build
+  shell:
+    chdir: /tmp/lastpass-cli
+    cmd: make
+
+- name: lastpass-cli - install
+  shell:
+    chdir: /tmp/lastpass-cli
+    cmd: make install
+  become: yes
+
+- name: lastpass-cli - remove source code
+  file:
+    path: /tmp/lastpass-cli
+    state: absent

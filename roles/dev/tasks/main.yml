@@ -1,0 +1,4 @@
+---
+- include: git.yml
+- include: editors.yml
+- include: java.yml

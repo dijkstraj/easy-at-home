@@ -1,0 +1,18 @@
+---
+- name: zsh
+  apt:
+    name: zsh
+
+- name: zsh - register default
+  shell: chsh -s /usr/bin/zsh {{ user }}
+  become: yes
+
+- name: oh-my-zsh
+  shell:
+    cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    creates: /home/{{ user }}/.zshrc
+
+- name: oh-my-zsh - autosuggestions
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: /home/{{ user }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions

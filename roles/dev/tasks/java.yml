@@ -1,0 +1,5 @@
+---
+- name: sdkman - download
+  shell:
+    cmd: curl -s "https://get.sdkman.io" | bash
+    creates: /home/{{ user }}/.sdkman/bin/sdkman-init.sh
