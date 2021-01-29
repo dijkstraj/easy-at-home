@@ -29,13 +29,22 @@ function prepare_lpass() {
   fi
 }
 
+# protected against copy-paste attacks
+echo "set enable-bracketed-paste on" > ~/.inputrc
+
 # start with the latest
 sudo apt update
 sudo apt upgrade -y
 sudo apt autoremove
 
 # just to be sure
-sudo apt install -y curl wget
+sudo apt install -y \
+  curl \
+  wget \
+  apt-transport-https \
+  ca-certificates \
+  gnupg-agent \
+  software-properties-common
 
 ask_one_time_question additional-drivers "Did you install the additional drivers for video and network card (y/n)?"
 if [[ "$REPLY" == "y" ]]; then
@@ -84,6 +93,10 @@ Host gitlab.com
 #  IdentityFile $HOME/.ssh/id_rsa_work
 EOF
 fi
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+sudo apt-add-repository https://cli.github.com/packages
+sudo apt update
+sudo apt install -y gh
 
 # shell
 if [ ! -d ~/.oh-my-zsh ]; then
@@ -94,7 +107,7 @@ fi
 if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
   git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 fi
-
+sudo apt install -y tmux
 
 # lastpass
 if [ ! -f /usr/bin/lpass ]; then
@@ -137,16 +150,30 @@ fi
 
 # PIA
 if [ ! -d /opt/piavpn/bin/ ]; then
-  curl -fsSL https://installers.privateinternetaccess.com/download/pia-linux-2.5-05652.run -o /tmp/pia.run 
+  curl -fsSL https://installers.privateinternetaccess.com/download/pia-linux-2.5-05652.run -o /tmp/pia.run
   chmod +x /tmp/pia.run
   /tmp/pia.run
 fi
 
 # languages
 #  python
-sudo apt install -y python3 idle3
+sudo apt install -y python3 idle3 python-is-python3 python3-venv
+sudo ln -s /usr/bin/pip3 /usr/local/bin/pip
+python3 -m pip install --upgrade pip
+python3 -m pip install --user virtualenv
+cat <<EOF > ~/.local/bin/init_project_python
+#!/bin/zsh
+python3 -m virtualenv env
+touch requirements.txt
+echo "run the following to activate the environment: source env/bin/activate"
+EOF
+chmod +x ~/.local/bin/init_project_python
+
 #  java
-# todo: sdkman
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk install java 15.0.1-zulu
+
 #  node
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | zsh
@@ -216,6 +243,47 @@ if [ ! -f /usr/local/bin/sclang ]; then
   (cd ~/Projects/SuperCollider-3.11.1-Source/build && make)
   (cd ~/Projects/SuperCollider-3.11.1-Source/build && sudo make install)
 fi
+
+# vlc
+sudo apt install -y vlc
+
+# docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+apt-key fingerprint 0EBFCD88
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+sudo apt update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo usermod -aG docker $USER
+
+# graphics
+sudo apt install -y gimp
+
+# vscode
+sudo snap install --classic code
+
+# aws cli
+sudo apt install -y awscli
+mkdir ~/.aws
+# use empty default to prevent accidental access
+cat <<EOF > ~/.aws/config
+[default]
+
+[profile ${USER}]
+region = eu-west-1
+output = json
+EOF
+cat <<EOF > ~/.aws/credentials
+[default]
+aws_access_key_id=
+aws_secret_access_key=
+
+[${USER}]
+aws_access_key_id=<id>
+aws_secret_access_key=<secret>
+EOF
 
 # cleanup
 rm -f /tmp/pia.run
