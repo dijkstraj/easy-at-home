@@ -16,3 +16,17 @@
   git:
     repo: https://github.com/zsh-users/zsh-autosuggestions
     dest: /home/{{ user }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+
+- name: zsh - configure theme
+  lineinfile:
+    path: /home/{{ user }}/.zshrc
+    regexp: '^ZSH_THEME='
+    line: 'ZSH_THEME="fino-time"'
+    insertafter: '^# Add wisely, as too many plugins'
+
+- name: zsh - configure plugins
+  lineinfile:
+    path: /home/{{ user }}/.zshrc
+    regexp: '^plugins='
+    line: 'plugins=(aws encode64 git zsh-autosuggestions)'
+    insertafter: '^# Add wisely, as too many plugins'

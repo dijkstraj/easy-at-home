@@ -1,4 +1,8 @@
 ---
 - include: git.yml
 - include: editors.yml
+- include: node.yml
 - include: java.yml
+- include: python.yml
+- include: aws.yml
+- include: ide.yml

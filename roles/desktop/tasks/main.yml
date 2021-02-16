@@ -1,0 +1,13 @@
+---
+- name: check if chrome exists
+  stat:
+    path: /bin/google-chrome
+  register: chrome_result
+
+- include: chrome.yml
+  when: not chrome_result.stat.exists
+
+- include: spotify.yml
+  when: '"spotify-client" not in ansible_facts.packages'
+
+- include: calibre.yml

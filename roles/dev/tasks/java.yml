@@ -3,3 +3,15 @@
   shell:
     cmd: curl -s "https://get.sdkman.io" | bash
     creates: /home/{{ user }}/.sdkman/bin/sdkman-init.sh
+
+- name: sdkman - register directory
+  lineinfile:
+    path: /home/{{ user }}/.zshrc
+    regexp: '^export SDKMAN_DIR'
+    line: 'export SDKMAN_DIR="$HOME/.sdkman"'
+
+- name: sdkman - register load
+  lineinfile:
+    path: /home/{{ user }}/.zshrc
+    regexp: 'sdkman-init.sh'
+    line: '[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"'

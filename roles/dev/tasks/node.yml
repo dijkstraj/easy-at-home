@@ -1,0 +1,27 @@
+---
+- name: node - clone nvm
+  git:
+    repo: https://github.com/nvm-sh/nvm
+    dest: /home/{{ user }}/.nvm
+    version: v0.37.2
+
+- name: node - register directory
+  lineinfile:
+    path: /home/{{ user }}/.zshrc
+    regexp: '^export NVM_DIR'
+    line: 'export NVM_DIR="$HOME/.nvm"'
+
+- name: node - load nvm
+  lineinfile:
+    path: /home/{{ user }}/.zshrc
+    regexp: 'NVM_DIR/nvm.sh'
+    line: '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+
+- name: node - load completions
+  lineinfile:
+    path: /home/{{ user }}/.zshrc
+    regexp: 'NVM_DIR/bash_completion'
+    line: '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+
+- name: node - install lts
+  shell: zsh -c 'source ~/.nvm/nvm.sh; nvm install --lts'

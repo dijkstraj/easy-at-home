@@ -4,4 +4,5 @@
     pkg:
       - git
       - git-gui
+    state: latest
   become: yes

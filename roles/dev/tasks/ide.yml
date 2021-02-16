@@ -1,0 +1,4 @@
+---
+- name: vscode
+  shell: snap install --classic vscode
+  become: yes

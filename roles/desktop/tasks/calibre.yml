@@ -1,0 +1,6 @@
+---
+- name: calibre
+  apt:
+    name: calibre
+    state: latest
+  become: yes

@@ -1,4 +1,8 @@
 ---
+- name: gather package facts
+  package_facts:
+    manager: apt
+
 - name: core packages
   apt:
     pkg:

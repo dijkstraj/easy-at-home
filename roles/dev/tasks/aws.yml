@@ -1,0 +1,30 @@
+---
+- name: aws-cli
+  apt:
+    name: awscli
+    state: latest
+  become: yes
+
+- name: aws-cli - default config
+  copy:
+    dest: /home/{{ user }}/.aws/config
+    content: |
+      [default]
+
+      [profile {{ user }}]
+      region = eu-west-1
+      output = json
+    force: no
+
+- name: aws-cli - default credentials
+  copy:
+    dest: /home/{{ user }}/.aws/credentials
+    content: |
+      [default]
+      aws_access_key_id=
+      aws_secret_access_key=
+
+      [{{ user }}]
+      aws_access_key_id=REPLACEME
+      aws_secret_access_key=REPLACEME
+    force: no
